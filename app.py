@@ -555,13 +555,18 @@ def mdev_endpoint():
 
         if HAS_ALLANTOOLS:
             try:
+                # Always compute at decade taus plus explicitly at 1e3, 1e4, 1e5
+                tau_targets = np.unique(np.concatenate([
+                    np.array([1e3, 1e4, 1e5]),
+                    np.logspace(np.log10(epoch_sec), np.log10(len(phase_s) * epoch_sec / 3), 30)
+                ]))
                 tau_out, mdev_out, _, _ = allantools.mdev(
                     phase_s,
                     rate=1.0 / epoch_sec,
                     data_type='phase',
-                    taus='decade',
+                    taus=tau_targets,
                 )
-                method = 'allantools.mdev (phase data, decade taus)'
+                method = 'allantools.mdev (phase data, explicit taus incl. 10³/10⁴/10⁵)'
             except Exception as ae:
                 app.logger.warning(f"allantools failed: {ae}; falling back to manual MDEV")
                 tau_out, mdev_out = _manual_mdev(phase_s, epoch_sec)
