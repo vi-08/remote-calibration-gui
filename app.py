@@ -70,6 +70,10 @@ def sttime_to_hms(sttime_s: int) -> str:
 # CGGTTS parser (ROBUST VERSION)
 # ──────────────────────────────────────────────────────────────────────────────
 
+# ──────────────────────────────────────────────────────────────────────────────
+# CGGTTS parser (fixed)
+# ──────────────────────────────────────────────────────────────────────────────
+
 CONST_CHAR = {
     'G': 'GPS',
     'E': 'Galileo',
@@ -113,6 +117,19 @@ def parse_cggtts(content: str, allowed_constellations: list[str]) -> pd.DataFram
     header = "\n".join(lines[:data_start])
     version = _detect_version(header)
 
+    # ── detect column indices from header (if present) ────────────────────────
+    refsys_idx = None
+    sat_idx = 0
+
+    for line in lines:
+        if line.strip().startswith("SAT CL"):
+            cols = line.split()
+            if "REFSYS" in cols:
+                refsys_idx = cols.index("REFSYS")
+            if "SAT" in cols:
+                sat_idx = cols.index("SAT")
+            break
+
     records = []
 
     for raw in lines[data_start:]:
@@ -124,7 +141,7 @@ def parse_cggtts(content: str, allowed_constellations: list[str]) -> pd.DataFram
         if len(tokens) < 8:
             continue
 
-        prn = tokens[0]
+        prn = tokens[sat_idx] if sat_idx < len(tokens) else tokens[0]
 
         # ── constellation detection ───────────────────────────────────────────
         const_char = prn[0] if prn and prn[0].isalpha() else "G"
@@ -134,20 +151,14 @@ def parse_cggtts(content: str, allowed_constellations: list[str]) -> pd.DataFram
             continue
 
         try:
-            # ── default safe parsing (works across formats) ───────────────────
             mjd = _safe_int(tokens[2])
             sttime = _safe_int(tokens[3])
 
             if mjd is None or sttime is None:
                 continue
 
-            # ── ELV handling (always present but position-safe) ───────────────
-            elv_raw = None
-            for idx in range(4, min(len(tokens), 10)):
-                if tokens[idx].isdigit():
-                    elv_raw = _safe_int(tokens[idx])
-                    break
-
+            # ── ELV extraction ────────────────────────────────────────────────
+            elv_raw = _safe_int(tokens[5]) if len(tokens) > 5 else None
             if elv_raw is None:
                 continue
 
@@ -155,14 +166,13 @@ def parse_cggtts(content: str, allowed_constellations: list[str]) -> pd.DataFram
             if elv_deg < 10.0:
                 continue
 
-            # ── REFSYS detection (CRITICAL FIX) ───────────────────────────────
-            # In V2E sample: REFSYS is usually around token[9]
+            # ── REFSYS extraction (header-based if possible) ──────────────────
             refsys_raw = None
 
-            if len(tokens) > 9:
-                refsys_raw = _safe_int(tokens[9])
+            if refsys_idx is not None and refsys_idx < len(tokens):
+                refsys_raw = _safe_int(tokens[refsys_idx])
 
-            # fallback scan (VERY IMPORTANT for robustness)
+            # fallback (for safety across variants)
             if refsys_raw is None:
                 for t in tokens:
                     val = _safe_int(t, None)
@@ -170,11 +180,7 @@ def parse_cggtts(content: str, allowed_constellations: list[str]) -> pd.DataFram
                         refsys_raw = val
                         break
 
-            if refsys_raw is None:
-                continue
-
-            # reject obvious garbage
-            if abs(refsys_raw) > 9_000_000:
+            if refsys_raw is None or abs(refsys_raw) > 9_000_000:
                 continue
 
             records.append({
