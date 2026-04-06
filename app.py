@@ -31,6 +31,19 @@ except ImportError:
 app = Flask(__name__)
 CORS(app)
 
+class _NumpyEncoder(json.JSONEncoder):
+    """Make numpy scalars and arrays JSON-serializable."""
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+app.json_encoder = _NumpyEncoder
+
 # ──────────────────────────────────────────────────────────────────────────────
 # MJD helpers
 # ──────────────────────────────────────────────────────────────────────────────
@@ -368,14 +381,14 @@ def run_aiv(nmc_df: pd.DataFrame, cust_df: pd.DataFrame,
         mjd, sttime = key
         diff = cust_avg[key]['mean'] - nmc_avg[key]['mean']
         epochs.append({
-            'MJD':      mjd,
-            'STTIME':   sttime,
+            'MJD':      int(mjd),
+            'STTIME':   int(sttime),
             'DATE':     mjd_to_date(mjd),
             'EPOCH':    sttime_to_hms(sttime),
-            'NMC_ns':   round(nmc_avg[key]['mean'], 4),
-            'CUST_ns':  round(cust_avg[key]['mean'], 4),
-            'DIFF_ns':  round(diff, 4),
-            'N_SATS':   max(nmc_avg[key]['n'], cust_avg[key]['n']),
+            'NMC_ns':   round(float(nmc_avg[key]['mean']), 4),
+            'CUST_ns':  round(float(cust_avg[key]['mean']), 4),
+            'DIFF_ns':  round(float(diff), 4),
+            'N_SATS':   int(max(nmc_avg[key]['n'], cust_avg[key]['n'])),
         })
 
     return epochs, fr_nmc, fr_cust
@@ -417,14 +430,14 @@ def run_cv(nmc_df: pd.DataFrame, cust_df: pd.DataFrame,
             continue
         mean_diff = diffs.mean()
         epochs.append({
-            'MJD':     mjd,
-            'STTIME':  sttime,
+            'MJD':     int(mjd),
+            'STTIME':  int(sttime),
             'DATE':    mjd_to_date(mjd),
             'EPOCH':   sttime_to_hms(sttime),
-            'NMC_ns':  round(grp['NMC_ns'].mean(), 4),
-            'CUST_ns': round(grp['CUST_ns'].mean(), 4),
-            'DIFF_ns': round(mean_diff, 4),
-            'N_SATS':  len(grp),
+            'NMC_ns':  round(float(grp['NMC_ns'].mean()), 4),
+            'CUST_ns': round(float(grp['CUST_ns'].mean()), 4),
+            'DIFF_ns': round(float(mean_diff), 4),
+            'N_SATS':  int(len(grp)),
         })
 
     epochs.sort(key=lambda e: (e['MJD'], e['STTIME']))
@@ -440,10 +453,10 @@ def build_summary(epochs: list[dict], mode: str, sigma_filter: bool) -> dict:
     return {
         'mode':           mode,
         'sigma_filter':   sigma_filter,
-        'n_epochs':       len(epochs),
-        'n_days':         len(set(mjds)),
-        'mjd_start':      min(mjds),
-        'mjd_end':        max(mjds),
+        'n_epochs':       int(len(epochs)),
+        'n_days':         int(len(set(mjds))),
+        'mjd_start':      int(min(mjds)),
+        'mjd_end':        int(max(mjds)),
         'date_start':     mjd_to_date(min(mjds)),
         'date_end':       mjd_to_date(max(mjds)),
         'mean_diff_ns':   float(arr.mean()),
