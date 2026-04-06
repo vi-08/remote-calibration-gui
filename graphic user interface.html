@@ -3,40 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RemoteCal — NMC Time Calibration</title>
+<title>NMC Remote Calibration System</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --navy:    #1a3a6b;
-  --navylt:  #2352a0;
-  --sky:     #e8f4fd;
-  --skylt:   #f5fbff;
-  --teal:    #0097a7;
-  --teallt:  #e0f7fa;
-  --green:   #2e7d32;
+  --navy: #1a3a6b;
+  --navylt: #2352a0;
+  --sky: #e8f4fd;
+  --skylt: #f5fbff;
+  --teal: #0097a7;
+  --teallt: #e0f7fa;
+  --green: #2e7d32;
   --greenlt: #e8f5e9;
-  --amber:   #e65100;
+  --amber: #e65100;
   --amberlt: #fff3e0;
-  --red:     #c62828;
-  --redlt:   #ffebee;
-  --purple:  #6a1b9a;
+  --red: #c62828;
+  --redlt: #ffebee;
+  --purple: #6a1b9a;
   --purplelt:#f3e5f5;
-  --grey:    #546e7a;
-  --greylt:  #f5f7f8;
-  --white:   #ffffff;
-  --border:  #cfd8dc;
-  --text:    #1c2b3a;
+  --grey: #546e7a;
+  --greylt: #f5f7f8;
+  --white: #ffffff;
+  --border: #cfd8dc;
+  --text: #1c2b3a;
   --textsub: #546e7a;
-  --shadow:  0 2px 8px rgba(0,0,0,0.10);
+  --shadow: 0 2px 8px rgba(0,0,0,0.10);
   --shadow2: 0 4px 16px rgba(0,0,0,0.14);
-  --r:       8px;
+  --r: 8px;
   --sidebar: 360px;
 }
-
 body {
   font-family: 'Nunito', sans-serif;
   background: #dfe6ed;
@@ -45,17 +43,16 @@ body {
   overflow: hidden;
   font-size: 15px;
 }
-
 /* ── LAYOUT ── */
-.app      { display: flex; height: 100vh; }
-.sidebar  {
+.app { display: flex; height: 100vh; }
+.sidebar {
   width: var(--sidebar); min-width: var(--sidebar);
   background: var(--navy);
   display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
   box-shadow: 4px 0 16px rgba(0,0,0,0.18);
 }
-.main     { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
 /* ── SIDEBAR ── */
 .logo-area {
@@ -64,8 +61,8 @@ body {
   border-bottom: 3px solid #3a6bbf;
 }
 .logo-title {
-  font-size: 22px; font-weight: 800; color: #fff;
-  letter-spacing: 0.01em; line-height: 1.1;
+  font-size: 17px; font-weight: 800; color: #fff;
+  letter-spacing: 0.01em; line-height: 1.2;
 }
 .logo-title span { color: #64b5f6; }
 .logo-sub { font-size: 11px; color: #90caf9; margin-top: 4px; letter-spacing: 0.04em; }
@@ -87,9 +84,9 @@ body {
 }
 .upload-zone:hover { border-color: #64b5f6; background: rgba(255,255,255,0.1); }
 .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-.uz-icon  { font-size: 22px; color: #64b5f6; }
+.uz-icon { font-size: 22px; color: #64b5f6; }
 .uz-title { font-size: 12px; color: #e3f2fd; font-weight: 600; margin-top: 2px; }
-.uz-sub   { font-size: 10px; color: #90caf9; margin-top: 2px; line-height: 1.5; }
+.uz-sub { font-size: 10px; color: #90caf9; margin-top: 2px; line-height: 1.5; }
 
 .file-tag {
   display: flex; align-items: center; gap: 6px;
@@ -97,10 +94,10 @@ body {
   border-radius: 5px; padding: 5px 8px; margin-bottom: 3px;
 }
 .ftag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.dot-nmc  { background: #64b5f6; }
+.dot-nmc { background: #64b5f6; }
 .dot-cust { background: #a5d6a7; }
 .ftag-name { flex: 1; font-size: 10px; color: #e3f2fd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ftag-rm  { font-size: 14px; color: #90caf9; cursor: pointer; padding: 0 2px; line-height: 1; }
+.ftag-rm { font-size: 14px; color: #90caf9; cursor: pointer; padding: 0 2px; line-height: 1; }
 .ftag-rm:hover { color: #ef9a9a; }
 
 /* SIDEBAR CONTROLS */
@@ -154,9 +151,9 @@ body {
   justify-content: space-between; box-shadow: var(--shadow);
 }
 .tb-title { font-size: 16px; font-weight: 800; color: var(--navy); }
-.tb-meta  { font-size: 11px; color: var(--textsub); margin-top: 2px; }
-.tb-btns  { display: flex; gap: 8px; }
-.act-btn  {
+.tb-meta { font-size: 11px; color: var(--textsub); margin-top: 2px; }
+.tb-btns { display: flex; gap: 8px; }
+.act-btn {
   padding: 8px 16px; font-size: 12px; font-family: 'Nunito', sans-serif;
   font-weight: 700; border: 2px solid var(--navylt); border-radius: 6px;
   background: var(--white); color: var(--navylt); cursor: pointer; transition: all 0.18s;
@@ -215,7 +212,7 @@ body {
   height: 380px; color: var(--textsub); gap: 12px; text-align: center;
 }
 .empty-icon { font-size: 56px; opacity: 0.35; }
-.empty-msg  { font-size: 14px; max-width: 380px; line-height: 1.7; }
+.empty-msg { font-size: 14px; max-width: 380px; line-height: 1.7; }
 
 /* STAT CARDS */
 .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
@@ -223,14 +220,14 @@ body {
   background: var(--white); border-radius: var(--r); padding: 14px 16px;
   box-shadow: var(--shadow); border-left: 5px solid var(--navylt);
 }
-.stat-card.green  { border-left-color: var(--green); }
-.stat-card.amber  { border-left-color: #f57c00; }
-.stat-card.red    { border-left-color: var(--red); }
-.stat-card.teal   { border-left-color: var(--teal); }
+.stat-card.green { border-left-color: var(--green); }
+.stat-card.amber { border-left-color: #f57c00; }
+.stat-card.red   { border-left-color: var(--red); }
+.stat-card.teal  { border-left-color: var(--teal); }
 .sc-label { font-size: 10px; font-weight: 700; color: var(--textsub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.sc-val   { font-size: 24px; font-weight: 800; color: var(--text); font-family: 'Source Code Pro', monospace; }
-.sc-unit  { font-size: 12px; color: var(--textsub); font-family: 'Nunito', sans-serif; margin-left: 3px; }
-.sc-sub   { font-size: 10px; color: var(--textsub); margin-top: 4px; }
+.sc-val { font-size: 24px; font-weight: 800; color: var(--text); font-family: 'Source Code Pro', monospace; }
+.sc-unit { font-size: 12px; color: var(--textsub); font-family: 'Nunito', sans-serif; margin-left: 3px; }
+.sc-sub { font-size: 10px; color: var(--textsub); margin-top: 4px; }
 
 /* PANEL */
 .panel {
@@ -243,10 +240,10 @@ body {
   background: #f8fafc;
 }
 .panel-title { font-size: 14px; font-weight: 800; color: var(--navy); }
-.panel-sub   { font-size: 10px; color: var(--textsub); margin-top: 2px; }
-.panel-body  { padding: 16px 18px; }
+.panel-sub { font-size: 10px; color: var(--textsub); margin-top: 2px; }
+.panel-body { padding: 16px 18px; }
 
-/* ERROR BAR toggle — simple checkbox row */
+/* ERROR BAR toggle */
 .eb-row { display: flex; align-items: center; gap: 8px; }
 .eb-row input { width: 16px; height: 16px; accent-color: #f57c00; cursor: pointer; }
 .eb-row label { font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer; }
@@ -308,10 +305,10 @@ tr:hover td { background: #e8f4fd; }
   box-shadow: var(--shadow2); opacity: 0; transition: all 0.28s;
   transform: translateY(-8px); max-width: 300px;
 }
-.notif.show   { opacity: 1; transform: none; }
-.notif.ok     { border-color: var(--green); color: var(--green); }
-.notif.err    { border-color: var(--red);   color: var(--red);   }
-.notif.warn   { border-color: #f57c00;      color: #e65100;      }
+.notif.show { opacity: 1; transform: none; }
+.notif.ok   { border-color: var(--green); color: var(--green); }
+.notif.err  { border-color: var(--red);   color: var(--red);   }
+.notif.warn { border-color: #f57c00; color: #e65100; }
 
 canvas { display: block; }
 </style>
@@ -322,14 +319,14 @@ canvas { display: block; }
 <!-- ══════════════ SIDEBAR ══════════════ -->
 <div class="sidebar">
   <div class="logo-area">
-    <div class="logo-title">Remote<span>Cal</span></div>
-    <div class="logo-sub">Metrological Time Calibration System</div>
+    <div class="logo-title">NMC Remote <span>Calibration System</span></div>
+    <div class="logo-sub">Metrological Time Calibration</div>
     <div class="logo-nmc">▸ National Metrology Centre, Singapore</div>
   </div>
 
   <!-- NMC REFERENCE FILES -->
   <div class="sb-block">
-    <div class="sb-heading">&#9312; NMC Reference Data (Operator)</div>
+    <div class="sb-heading">① NMC Reference Data (Operator)</div>
     <div class="upload-zone" id="nmc-zone">
       <input type="file" id="nmc-files" multiple>
       <div class="uz-icon">📂</div>
@@ -341,7 +338,7 @@ canvas { display: block; }
 
   <!-- CUSTOMER FILES -->
   <div class="sb-block">
-    <div class="sb-heading">&#9313; Customer Lab Data</div>
+    <div class="sb-heading">② Customer Lab Data</div>
     <div class="upload-zone" id="cust-zone">
       <input type="file" id="cust-files" multiple>
       <div class="uz-icon">📂</div>
@@ -353,10 +350,10 @@ canvas { display: block; }
 
   <!-- TIME TRANSFER MODE -->
   <div class="sb-block">
-    <div class="sb-heading">&#9314; Time Transfer Mode</div>
+    <div class="sb-heading">③ Time Transfer Mode</div>
     <div class="mode-grp">
       <button class="mode-btn active" id="btn-aiv" onclick="setMode('AIV')">All-in-View</button>
-      <button class="mode-btn"        id="btn-cv"  onclick="setMode('CV')">Common View</button>
+      <button class="mode-btn" id="btn-cv" onclick="setMode('CV')">Common View</button>
     </div>
     <div class="mode-desc" id="mode-desc">
       All satellites visible to each lab at each epoch are averaged independently.
@@ -365,7 +362,7 @@ canvas { display: block; }
 
   <!-- FILTERING -->
   <div class="sb-block">
-    <div class="sb-heading">&#9315; Filtering</div>
+    <div class="sb-heading">④ Filtering</div>
     <label class="cb-row">
       <input type="checkbox" id="sigma-on" checked>
       <span class="cb-label">Apply 2σ clipping per epoch</span>
@@ -377,7 +374,7 @@ canvas { display: block; }
 
   <!-- CONSTELLATIONS -->
   <div class="sb-block">
-    <div class="sb-heading">&#9316; GNSS Constellations</div>
+    <div class="sb-heading">⑤ GNSS Constellations</div>
     <label class="cb-row">
       <input type="checkbox" id="c-gps" checked>
       <span class="cb-label">GPS</span>
@@ -402,7 +399,7 @@ canvas { display: block; }
 
   <!-- ELEVATION MASK -->
   <div class="sb-block">
-    <div class="sb-heading">&#9317; Elevation Mask</div>
+    <div class="sb-heading">⑥ Elevation Mask</div>
     <div class="elev-info">
       <span>Fixed at</span>
       <span class="elev-val">10°</span>
@@ -417,27 +414,25 @@ canvas { display: block; }
 <div class="main">
   <div class="topbar">
     <div>
-      <div class="tb-title" id="tb-title">RemoteCal — NMC Time Calibration</div>
-      <div class="tb-meta"  id="tb-meta">Upload NMC reference and customer files, then press Run Calibration</div>
+      <div class="tb-title" id="tb-title">NMC Remote Calibration System</div>
+      <div class="tb-meta" id="tb-meta">Upload NMC reference and customer files, then press Run Calibration</div>
     </div>
     <div class="tb-btns">
       <button class="act-btn" onclick="exportCSV()">⬇ Export CSV</button>
       <button class="act-btn" onclick="exportReport()">⬇ Export Report</button>
     </div>
   </div>
-
   <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
 
   <!-- SESSION TABS BAR -->
   <div class="session-bar" id="sess-bar">
-    <!-- tabs injected here -->
     <button class="sess-new" title="New session" onclick="newSession()">+</button>
   </div>
 
-  <!-- INNER TABS (Results / MDEV) -->
+  <!-- INNER TABS -->
   <div class="inner-tabbar">
     <div class="inner-tab active" id="it-results" onclick="switchInner('results')">Results</div>
-    <div class="inner-tab"       id="it-mdev"    onclick="switchInner('mdev')">MDEV Analysis</div>
+    <div class="inner-tab" id="it-mdev" onclick="switchInner('mdev')">MDEV Analysis</div>
   </div>
 
   <!-- ── RESULTS PANEL ── -->
@@ -451,7 +446,6 @@ canvas { display: block; }
     </div>
     <div id="r-content" style="display:none">
       <div class="stat-row" id="stat-row"></div>
-
       <div class="panel" id="filter-panel" style="display:none">
         <div class="panel-head"><div class="panel-title">Filtering Report</div></div>
         <div class="panel-body">
@@ -459,7 +453,6 @@ canvas { display: block; }
           <div class="filter-report" style="background:var(--teallt);border-color:#80cbc4;" id="filter-report-cust"></div>
         </div>
       </div>
-
       <div class="panel">
         <div class="panel-head">
           <div>
@@ -477,7 +470,6 @@ canvas { display: block; }
           </div>
         </div>
       </div>
-
       <div class="panel">
         <div class="panel-head">
           <div class="panel-title">Epoch Summary Table</div>
@@ -522,7 +514,6 @@ canvas { display: block; }
         </div>
         <button class="mdev-run-btn" onclick="computeMDEV()">Compute MDEV</button>
       </div>
-
       <div class="panel" id="mdev-result-panel" style="display:none">
         <div class="panel-head">
           <div class="panel-title">Modified Allan Deviation — UTC(Lab) − UTC(NMC)</div>
@@ -544,34 +535,33 @@ canvas { display: block; }
 
 <script>
 // ═══════════════════════════════════════
-//  CONFIG
+// CONFIG
 // ═══════════════════════════════════════
-// Set this to "" to use the Flask backend at the same origin,
-// or e.g. "http://localhost:5000" when running the HTML standalone with CORS.
+// Set to "" to use Flask at the same origin,
+// or e.g. "http://localhost:5000" when running HTML standalone with CORS.
 const API_BASE = "";
 
 // ═══════════════════════════════════════
-//  SESSION STATE
+// SESSION STATE
 // ═══════════════════════════════════════
-let sessions = [];         // array of session objects
-let activeSession = null;  // id of active session
+let sessions = [];
+let activeSession = null;
 let sessionCounter = 0;
-
-let charts = {};           // { main: ChartInstance, mdev: ChartInstance }
+let charts = {};
 
 function createSession(label) {
   const id = ++sessionCounter;
   const sess = {
     id,
     label: label || `Session ${id}`,
-    nmc_files:  [],
+    nmc_files: [],
     cust_files: [],
-    result:     null,   // null until calibrated
-    epochs:     [],
-    summary:    null,
+    result: null,
+    epochs: [],
+    summary: null,
     filter_nmc: null,
-    filter_cust:null,
-    mdev:       null,
+    filter_cust: null,
+    mdev: null,
   };
   sessions.push(sess);
   renderSessionTabs();
@@ -583,16 +573,13 @@ function activateSession(id) {
   activeSession = id;
   renderSessionTabs();
   const sess = getSession();
-  // Sync file lists for this session
   renderFileList('nmc', sess.nmc_files);
   renderFileList('cust', sess.cust_files);
-  // Show/hide results
   if (sess.result) showResults(sess); else showEmpty();
-  if (sess.mdev)   showMdev(sess);   else showMdevEmpty();
+  if (sess.mdev) showMdev(sess); else showMdevEmpty();
 }
 
 function getSession(id) { return sessions.find(s => s.id === (id || activeSession)); }
-
 function newSession() { createSession(); }
 
 function closeSession(id, ev) {
@@ -607,10 +594,8 @@ function closeSession(id, ev) {
 
 function renderSessionTabs() {
   const bar = document.getElementById('sess-bar');
-  // Remove existing tabs (keep the + button)
   [...bar.querySelectorAll('.sess-tab')].forEach(el => el.remove());
   const newBtn = bar.querySelector('.sess-new');
-
   sessions.forEach(sess => {
     const tab = document.createElement('div');
     tab.className = 'sess-tab' + (sess.id === activeSession ? ' active' : '');
@@ -625,7 +610,7 @@ function renderSessionTabs() {
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
 // ═══════════════════════════════════════
-//  GLOBAL FILE LISTS (sidebar bound to active session)
+// FILE LISTS
 // ═══════════════════════════════════════
 document.getElementById('nmc-files').addEventListener('change', function() {
   const sess = getSession();
@@ -633,6 +618,7 @@ document.getElementById('nmc-files').addEventListener('change', function() {
   renderFileList('nmc', sess.nmc_files);
   this.value = '';
 });
+
 document.getElementById('cust-files').addEventListener('change', function() {
   const sess = getSession();
   [...this.files].forEach(f => { if (!sess.cust_files.find(x => x.name===f.name)) sess.cust_files.push(f); });
@@ -660,32 +646,32 @@ function renderFileList(side, files) {
 }
 
 // ═══════════════════════════════════════
-//  MODE
+// MODE
 // ═══════════════════════════════════════
 let currentMode = 'AIV';
 function setMode(m) {
   currentMode = m;
   document.getElementById('btn-aiv').classList.toggle('active', m==='AIV');
-  document.getElementById('btn-cv').classList.toggle('active',  m==='CV');
+  document.getElementById('btn-cv').classList.toggle('active', m==='CV');
   document.getElementById('mode-desc').textContent = m==='AIV'
     ? 'All satellites visible to each lab at each epoch are averaged independently.'
     : 'Only satellites common to BOTH labs at each epoch are used (per-satellite matching).';
 }
 
 // ═══════════════════════════════════════
-//  INNER TAB
+// INNER TAB
 // ═══════════════════════════════════════
 let innerTab = 'results';
 function switchInner(t) {
   innerTab = t;
   document.getElementById('pane-results').style.display = t==='results' ? 'block' : 'none';
-  document.getElementById('pane-mdev').style.display    = t==='mdev'    ? 'block' : 'none';
+  document.getElementById('pane-mdev').style.display   = t==='mdev'    ? 'block' : 'none';
   document.getElementById('it-results').classList.toggle('active', t==='results');
-  document.getElementById('it-mdev').classList.toggle('active',    t==='mdev');
+  document.getElementById('it-mdev').classList.toggle('active', t==='mdev');
 }
 
 // ═══════════════════════════════════════
-//  RUN CALIBRATION
+// RUN CALIBRATION
 // ═══════════════════════════════════════
 async function runCalibration() {
   const sess = getSession();
@@ -702,18 +688,16 @@ async function runCalibration() {
   const fd = new FormData();
   sess.nmc_files.forEach(f  => fd.append('nmc_files[]',  f));
   sess.cust_files.forEach(f => fd.append('cust_files[]', f));
-  fd.append('mode',          currentMode);
-  fd.append('sigma_filter',  document.getElementById('sigma-on').checked ? 'true' : 'false');
-  fd.append('sigma',         '2.0');
+  fd.append('mode',         currentMode);
+  fd.append('sigma_filter', document.getElementById('sigma-on').checked ? 'true' : 'false');
+  fd.append('sigma',        '2.0');
   fd.append('constellations', JSON.stringify(consts));
 
   setProg(30);
-
   try {
     const resp = await fetch(API_BASE + '/api/calibrate', { method: 'POST', body: fd });
     setProg(75);
     const data = await resp.json();
-
     if (!resp.ok || data.error) {
       toast(data.error || 'Server error', 'err');
       setProg(0); btn.disabled=false; btn.textContent='▶ Run Calibration'; return;
@@ -721,20 +705,19 @@ async function runCalibration() {
 
     sess.epochs     = data.epochs;
     sess.summary    = data.summary;
-    sess.filter_nmc = data.filter_report_nmc;
-    sess.filter_cust= data.filter_report_cust;
-    sess.result     = true;
-    sess.mdev       = null;  // clear old MDEV when re-running
+    sess.filter_nmc  = data.filter_report_nmc;
+    sess.filter_cust = data.filter_report_cust;
+    sess.result = true;
+    sess.mdev = null;
 
-    // Auto-label session with date range
     const s = data.summary;
     sess.label = s.date_start === s.date_end
       ? `${s.date_start} · ${consts.join('+')}`
       : `${s.date_start} → ${s.date_end} · ${consts.join('+')}`;
     renderSessionTabs();
 
-    // Update topbar
-    document.getElementById('tb-title').textContent = `UTC(Lab) − UTC(NMC) · ${currentMode}`;
+    document.getElementById('tb-title').textContent =
+      `NMC Remote Calibration System — UTC(Lab) − UTC(NMC) · ${currentMode}`;
     document.getElementById('tb-meta').textContent =
       `MJD ${s.mjd_start}–${s.mjd_end} · ${s.date_start} to ${s.date_end} · ${consts.join('+')} · ${s.n_epochs} epochs`;
 
@@ -742,7 +725,6 @@ async function runCalibration() {
     setProg(100);
     setTimeout(() => setProg(0), 700);
     toast(`Calibration complete — ${s.n_epochs} epochs matched`, 'ok');
-
   } catch(e) {
     toast('Network error: ' + e.message, 'err');
     setProg(0);
@@ -756,25 +738,22 @@ function getConsts() {
 }
 
 // ═══════════════════════════════════════
-//  SHOW RESULTS
+// SHOW RESULTS
 // ═══════════════════════════════════════
 function showEmpty() {
-  document.getElementById('r-empty').style.display   = 'flex';
+  document.getElementById('r-empty').style.display = 'flex';
   document.getElementById('r-content').style.display = 'none';
 }
 function showMdevEmpty() {
-  document.getElementById('m-empty').style.display   = 'flex';
+  document.getElementById('m-empty').style.display = 'flex';
   document.getElementById('m-content').style.display = 'none';
 }
 
 function showResults(sess) {
-  document.getElementById('r-empty').style.display   = 'none';
+  document.getElementById('r-empty').style.display = 'none';
   document.getElementById('r-content').style.display = 'block';
-
   const s = sess.summary;
-  const diffs = sess.epochs.map(e => e.DIFF_ns);
 
-  // stat cards
   document.getElementById('stat-row').innerHTML = `
     <div class="stat-card">
       <div class="sc-label">Mean Calibration Offset</div>
@@ -797,9 +776,7 @@ function showResults(sess) {
       <div class="sc-sub">${s.mode} · σ-clip: ${s.sigma_filter ? 'ON' : 'OFF'}</div>
     </div>`;
 
-  // filter report
-  const sigma_on = s.sigma_filter;
-  if (sigma_on && sess.filter_nmc && sess.filter_cust) {
+  if (s.sigma_filter && sess.filter_nmc && sess.filter_cust) {
     document.getElementById('filter-panel').style.display = 'block';
     const fn = sess.filter_nmc, fc = sess.filter_cust;
     document.getElementById('filter-report-nmc').innerHTML =
@@ -812,7 +789,6 @@ function showResults(sess) {
     document.getElementById('filter-panel').style.display = 'none';
   }
 
-  // subtitle
   document.getElementById('chart-sub').textContent =
     `Mode: ${s.mode} · Sigma clip: ${s.sigma_filter ? '2σ ON' : 'OFF'} · ${s.n_epochs} matched epochs`;
 
@@ -822,7 +798,7 @@ function showResults(sess) {
 }
 
 // ═══════════════════════════════════════
-//  MAIN CHART
+// MAIN CHART
 // ═══════════════════════════════════════
 function drawMainChart(epochs) {
   const useEB = document.getElementById('errbar-on').checked;
@@ -881,12 +857,12 @@ function drawMainChart(epochs) {
       scales: {
         x: {
           ticks: { color: '#78909c', font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 18 },
-          grid:  { color: '#eceff1' }
+          grid: { color: '#eceff1' }
         },
         y: {
           title: { display: true, text: 'Time Difference (ns)', color: '#1a3a6b', font: { size: 11, weight: '700' } },
           ticks: { color: '#78909c', font: { size: 10 }, callback: v => v.toFixed(1) },
-          grid:  { color: '#eceff1' }
+          grid: { color: '#eceff1' }
         }
       }
     }
@@ -899,7 +875,7 @@ function redrawChart() {
 }
 
 // ═══════════════════════════════════════
-//  EPOCH TABLE
+// EPOCH TABLE
 // ═══════════════════════════════════════
 function buildEpochTable(epochs) {
   document.getElementById('ep-count').textContent =
@@ -920,15 +896,13 @@ function buildEpochTable(epochs) {
 }
 
 // ═══════════════════════════════════════
-//  MDEV
+// MDEV
 // ═══════════════════════════════════════
 async function computeMDEV() {
   const sess = getSession();
   if (!sess || !sess.epochs.length) { toast('Run calibration first.', 'err'); return; }
-
   const epoch_sec = parseFloat(document.getElementById('md-epoch').value) || 780;
   const diff_ns   = sess.epochs.map(e => e.DIFF_ns);
-
   try {
     const resp = await fetch(API_BASE + '/api/mdev', {
       method: 'POST',
@@ -937,7 +911,6 @@ async function computeMDEV() {
     });
     const data = await resp.json();
     if (!resp.ok || data.error) { toast(data.error || 'MDEV error', 'err'); return; }
-
     sess.mdev = data;
     showMdev(sess);
     switchInner('mdev');
@@ -948,18 +921,14 @@ async function computeMDEV() {
 }
 
 function showMdev(sess) {
-  document.getElementById('m-empty').style.display   = 'none';
+  document.getElementById('m-empty').style.display  = 'none';
   document.getElementById('m-content').style.display = 'block';
-
   if (!sess.mdev) return;
   const { tau, mdev, method, summary } = sess.mdev;
 
   document.getElementById('mdev-result-panel').style.display = 'block';
   document.getElementById('mdev-method').textContent = `Computed via: ${method}`;
 
-  // ── Chart: x-axis = log10(tau), with ticks at 10^3, 10^4, 10^5  ──
-  // We use a logarithmic scale and force ticks at exactly those values,
-  // matching the style of [3.5] New_pipeline.py which uses xticks([1e3,1e4,1e5]).
   if (charts.mdev) charts.mdev.destroy();
   const ctx = document.getElementById('mdevChart').getContext('2d');
   charts.mdev = new Chart(ctx, {
@@ -995,124 +964,113 @@ function showMdev(sess) {
           type: 'logarithmic',
           title: { display: true, text: 'Averaging Time, Tau (τ) / s', color: '#1a3a6b', font: { size: 12, weight: '700', family: 'Nunito' } },
           ticks: {
-            color: '#78909c',
-            font: { size: 11 },
-            // Match [3.5]: show only 10³, 10⁴, 10⁵
-            callback(value) {
-              const map = { 1000: '10³', 10000: '10⁴', 100000: '10⁵' };
-              return map[value] !== undefined ? map[value] : null;
-            },
-            // Force exactly these three major ticks
-            includeBounds: false,
+            color: '#78909c', font: { size: 11 },
+            callback: (val) => {
+              const candidates = [1e3, 1e4, 1e5];
+              if (candidates.some(c => Math.abs(val - c) / c < 0.01))
+                return val.toExponential(0);
+              return null;
+            }
           },
-          afterBuildTicks(scale) {
-            scale.ticks = [
-              { value: 1e3 },
-              { value: 1e4 },
-              { value: 1e5 },
-            ];
-          },
-          min: 800,
-          max: 120000,
-          grid: { color: '#eceff1' },
+          grid: { color: '#eceff1' }
         },
         y: {
           type: 'logarithmic',
-          title: { display: true, text: 'Modified Allan Deviation / s', color: '#6a1b9a', font: { size: 12, weight: '700', family: 'Nunito' } },
+          title: { display: true, text: 'MDEV (s)', color: '#6a1b9a', font: { size: 12, weight: '700', family: 'Nunito' } },
           ticks: {
             color: '#78909c', font: { size: 10 },
-            callback: v => v.toExponential(0),
+            callback: val => val.toExponential(1)
           },
-          grid: { color: '#eceff1' },
+          grid: { color: '#eceff1' }
         }
       }
     }
   });
 
   // Summary table
-  let rows = '';
-  const tauLabels = { 'tau_1e+03': '10³ s', 'tau_1e+04': '10⁴ s', 'tau_1e+05': '10⁵ s' };
-  for (const [k, v] of Object.entries(summary)) {
-    const label = tauLabels[k] || k;
-    rows += `<tr><td>τ = ${label}</td><td>${v.mdev_s} s</td><td>${v.tau_actual_s} s</td></tr>`;
+  if (summary && summary.length) {
+    let html = `<table><thead><tr><th>τ (s)</th><th>MDEV (s/s)</th><th>Freq Stability</th></tr></thead><tbody>`;
+    summary.forEach(row => {
+      html += `<tr><td>${Number(row.tau).toExponential(2)}</td><td>${Number(row.mdev).toExponential(3)}</td><td>${row.label||''}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('mdev-summary').innerHTML = html;
   }
-  document.getElementById('mdev-summary').innerHTML = rows ? `
-    <table style="margin-top:14px;max-width:420px">
-      <thead><tr><th>Averaging time</th><th>MDEV (s)</th><th>Actual τ (s)</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>` : '';
 }
 
 // ═══════════════════════════════════════
-//  EXPORT
+// EXPORT
 // ═══════════════════════════════════════
 function exportCSV() {
   const sess = getSession();
-  if (!sess || !sess.epochs.length) { toast('Run calibration first.', 'err'); return; }
-  const lines = ['MJD,Date,Epoch_HHMMSS,NMC_REFSYS_ns,Customer_REFSYS_ns,Delta_ns,N_Sats'];
-  for (const r of sess.epochs)
-    lines.push(`${r.MJD},${r.DATE},${r.EPOCH},${r.NMC_ns.toFixed(4)},${r.CUST_ns.toFixed(4)},${r.DIFF_ns.toFixed(4)},${r.N_SATS}`);
-  download(lines.join('\n'), `RemoteCal_Session${activeSession}_${Date.now()}.csv`, 'text/csv');
+  if (!sess || !sess.epochs.length) { toast('No calibration data to export.', 'warn'); return; }
+  const hdr = 'MJD,DATE,EPOCH,NMC_REFSYS_ns,CUST_REFSYS_ns,DIFF_ns,N_SATS\n';
+  const rows = sess.epochs.map(e =>
+    `${e.MJD},${e.DATE},${e.EPOCH},${e.NMC_ns.toFixed(3)},${e.CUST_ns.toFixed(3)},${e.DIFF_ns.toFixed(3)},${e.N_SATS}`
+  ).join('\n');
+  downloadBlob(hdr + rows, `NMC_RemCal_${sess.label.replace(/[^a-z0-9]/gi,'_')}.csv`, 'text/csv');
   toast('CSV exported.', 'ok');
 }
 
 function exportReport() {
   const sess = getSession();
-  if (!sess || !sess.summary) { toast('Run calibration first.', 'err'); return; }
+  if (!sess || !sess.summary) { toast('No calibration data to export.', 'warn'); return; }
   const s = sess.summary;
-  const txt =
-`REMOTECAL — CALIBRATION REPORT
-Generated : ${new Date().toISOString()}
-Laboratory : National Metrology Centre (NMC), Singapore
-Session    : ${sess.label}
-
-PARAMETERS
-  Time transfer mode : ${s.mode}
-  Sigma clipping     : ${s.sigma_filter ? `Enabled (${s.sigma}σ)` : 'Disabled'}
-  Elevation mask     : 10°
-  MJD range          : ${s.mjd_start} – ${s.mjd_end}
-  Date range         : ${s.date_start} to ${s.date_end}
-  Epochs matched     : ${s.n_epochs}
-  Days covered       : ${s.n_days}
-
-RESULTS
-  Mean Δ UTC(Lab) – UTC(NMC) : ${s.mean_diff_ns} ns
-  Standard deviation (1σ)    : ${s.std_diff_ns} ns
-  Peak |Δ|                   : ${s.peak_diff_ns} ns
-  Min Δ                      : ${s.min_diff_ns} ns
-  Max Δ                      : ${s.max_diff_ns} ns
-
-INTERPRETATION
-  The customer clock runs ${s.mean_diff_ns > 0 ? 'FAST' : 'SLOW'} by ${Math.abs(s.mean_diff_ns)} ns
-  relative to UTC(NMC). Apply a correction of ${s.mean_diff_ns > 0 ? '-' : '+'}${Math.abs(s.mean_diff_ns)} ns.
-
----
-RemoteCal — National Metrology Centre, Singapore
-For enquiries: nmc@nmc.a-star.edu.sg`;
-  download(txt, `RemoteCal_Report_Session${activeSession}_${Date.now()}.txt`, 'text/plain');
+  const lines = [
+    '='.repeat(60),
+    'NMC REMOTE CALIBRATION SYSTEM — CALIBRATION REPORT',
+    'National Metrology Centre, Singapore',
+    '='.repeat(60),
+    `Session  : ${sess.label}`,
+    `Mode     : ${s.mode}`,
+    `Sigma filter: ${s.sigma_filter ? 'ON (2σ)' : 'OFF'}`,
+    `MJD range: ${s.mjd_start} – ${s.mjd_end}`,
+    `Date range: ${s.date_start} – ${s.date_end}`,
+    `Epochs   : ${s.n_epochs} over ${s.n_days} day(s)`,
+    '-'.repeat(60),
+    `Mean calibration offset : ${s.mean_diff_ns.toFixed(3)} ns`,
+    `1σ stability            : ${s.std_diff_ns.toFixed(3)} ns`,
+    `Peak |Δ|                : ${s.peak_diff_ns.toFixed(2)} ns`,
+    '='.repeat(60),
+    'Epoch Data (MJD, DATE, EPOCH, NMC_ns, CUST_ns, DIFF_ns, N_SATS)',
+    '-'.repeat(60),
+    ...sess.epochs.map(e =>
+      `${e.MJD}  ${e.DATE}  ${e.EPOCH}  ${e.NMC_ns.toFixed(3).padStart(9)}  ${e.CUST_ns.toFixed(3).padStart(9)}  ${e.DIFF_ns.toFixed(3).padStart(9)}  ${e.N_SATS}`
+    ),
+  ];
+  downloadBlob(lines.join('\n'), `NMC_RemCal_Report_${sess.label.replace(/[^a-z0-9]/gi,'_')}.txt`, 'text/plain');
   toast('Report exported.', 'ok');
 }
 
-function download(content, filename, mime) {
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
-  a.download = filename; a.click();
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 
 // ═══════════════════════════════════════
-//  PROGRESS & TOAST
+// UI HELPERS
 // ═══════════════════════════════════════
-function setProg(p) { document.getElementById('prog').style.width = p + '%'; }
+function setProg(pct) {
+  document.getElementById('prog').style.width = pct + '%';
+}
+
+let _notifTimer;
 function toast(msg, type='ok') {
   const el = document.getElementById('notif');
-  el.textContent = msg; el.className = 'notif show ' + type;
-  setTimeout(() => el.classList.remove('show'), 3500);
+  el.textContent = msg;
+  el.className = 'notif show ' + type;
+  clearTimeout(_notifTimer);
+  _notifTimer = setTimeout(() => { el.className = 'notif'; }, 3500);
 }
 
-// ═══════════════════════════════════════
-//  INIT — create first session
-// ═══════════════════════════════════════
-createSession('Session 1');
+// ── BOOT ──
+createSession();
 </script>
 </body>
 </html>
