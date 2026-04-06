@@ -331,7 +331,7 @@ canvas { display: block; }
       <input type="file" id="nmc-files" multiple>
       <div class="uz-icon">📂</div>
       <div class="uz-title">Click or drag NMC files here</div>
-      <div class="uz-sub">Any CGGTTS format · any filename<br>E/C/G/R prefix · multi-day supported</div>
+      <div class="uz-sub"> Please provide in CGGTTS format </div>
     </div>
     <div id="nmc-list"></div>
   </div>
@@ -368,7 +368,7 @@ canvas { display: block; }
       <span class="cb-label">Apply 2σ clipping per epoch</span>
     </label>
     <div style="font-size:10px;color:#90caf9;padding-left:24px;line-height:1.6;margin-top:2px">
-      Removes REFSYS outliers beyond ±2 std from the epoch mean, applied independently to both labs before averaging.
+      Removes outlier REFSYS values beyond ±2 std from the mean REFSYS at a given epoch; applied independently to both labs before averaging.
     </div>
   </div>
 
@@ -401,9 +401,8 @@ canvas { display: block; }
   <div class="sb-block">
     <div class="sb-heading">⑥ Elevation Mask</div>
     <div class="elev-info">
-      <span>Fixed at</span>
+      <span>Set to</span>
       <span class="elev-val">10°</span>
-      <span>(standard metrological practice)</span>
     </div>
   </div>
 
@@ -655,7 +654,7 @@ function setMode(m) {
   document.getElementById('btn-cv').classList.toggle('active', m==='CV');
   document.getElementById('mode-desc').textContent = m==='AIV'
     ? 'All satellites visible to each lab at each epoch are averaged independently.'
-    : 'Only satellites common to BOTH labs at each epoch are used (per-satellite matching).';
+    : 'Only satellites common to both labs at each epoch are averaged.';
 }
 
 // ═══════════════════════════════════════
