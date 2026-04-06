@@ -214,20 +214,43 @@ body {
 .empty-icon { font-size: 56px; opacity: 0.35; }
 .empty-msg { font-size: 14px; max-width: 380px; line-height: 1.7; }
 
-/* STAT CARDS */
-.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
-.stat-card {
-  background: var(--white); border-radius: var(--r); padding: 14px 16px;
-  box-shadow: var(--shadow); border-left: 5px solid var(--navylt);
+/* TIME RANGE BAR */
+.time-range-bar {
+  background: var(--white); border-radius: var(--r); padding: 14px 20px;
+  box-shadow: var(--shadow); margin-bottom: 14px;
+  border-left: 5px solid var(--navylt);
+  display: flex; align-items: center; gap: 0; flex-wrap: wrap;
 }
-.stat-card.green { border-left-color: var(--green); }
-.stat-card.amber { border-left-color: #f57c00; }
-.stat-card.red   { border-left-color: var(--red); }
-.stat-card.teal  { border-left-color: var(--teal); }
-.sc-label { font-size: 10px; font-weight: 700; color: var(--textsub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.sc-val { font-size: 24px; font-weight: 800; color: var(--text); font-family: 'Source Code Pro', monospace; }
-.sc-unit { font-size: 12px; color: var(--textsub); font-family: 'Nunito', sans-serif; margin-left: 3px; }
-.sc-sub { font-size: 10px; color: var(--textsub); margin-top: 4px; }
+.trb-section-title {
+  font-size: 10px; font-weight: 700; color: var(--navylt); text-transform: uppercase;
+  letter-spacing: 0.12em; margin-right: 18px; white-space: nowrap; flex-shrink: 0;
+}
+.trb-divider { width: 1px; background: var(--border); align-self: stretch; margin: 0 16px; flex-shrink: 0; }
+.trb-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.trb-label { font-size: 9px; font-weight: 700; color: var(--textsub); text-transform: uppercase; letter-spacing: 0.1em; }
+.trb-val { font-size: 14px; font-weight: 800; color: var(--text); font-family: 'Source Code Pro', monospace; white-space: nowrap; }
+.trb-sub  { font-size: 10px; color: var(--textsub); }
+.trb-ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.trb-ctrl label { font-size: 10px; font-weight: 700; color: var(--textsub); white-space: nowrap; }
+.trb-input {
+  padding: 4px 8px; border: 2px solid var(--border); border-radius: 5px;
+  font-family: 'Source Code Pro', monospace; font-size: 12px; color: var(--text);
+  width: 70px; outline: none; transition: border-color 0.18s;
+}
+.trb-input:focus { border-color: var(--navylt); }
+.trb-apply {
+  padding: 4px 12px; background: var(--navylt); border: none; border-radius: 5px;
+  color: #fff; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.trb-apply:hover { background: var(--navy); }
+.trb-mode-grp { display: flex; gap: 4px; }
+.trb-mode-btn {
+  padding: 4px 10px; font-size: 10px; font-family: 'Nunito', sans-serif;
+  font-weight: 700; border: 2px solid var(--border); border-radius: 5px;
+  background: var(--white); color: var(--textsub); cursor: pointer; transition: all 0.15s;
+}
+.trb-mode-btn.active { background: var(--navylt); border-color: var(--navylt); color: #fff; }
 
 /* PANEL */
 .panel {
@@ -417,8 +440,8 @@ canvas { display: block; }
       <div class="tb-meta" id="tb-meta">Upload NMC reference and customer files, then press Run Calibration</div>
     </div>
     <div class="tb-btns">
-      <button class="act-btn" onclick="exportCSV()">⬇ Export CSV</button>
-      <button class="act-btn" onclick="exportReport()">⬇ Export Report</button>
+      <button class="act-btn" onclick="exportCSV()" title="Export epoch data as CSV">⬇ Export CSV</button>
+      <button class="act-btn" onclick="exportChart()" title="Export current chart as PNG image">⬇ Export Chart</button>
     </div>
   </div>
   <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
@@ -444,7 +467,7 @@ canvas { display: block; }
       </div>
     </div>
     <div id="r-content" style="display:none">
-      <div class="stat-row" id="stat-row"></div>
+      <div id="stat-row"></div>
       <div class="panel" id="filter-panel" style="display:none">
         <div class="panel-head"><div class="panel-title">Filtering Report</div></div>
         <div class="panel-body">
@@ -479,7 +502,7 @@ canvas { display: block; }
             <thead><tr>
               <th>MJD</th><th>Date (DD-MM-YYYY)</th><th>Epoch (HH:MM:SS)</th>
               <th>NMC REFSYS (ns)</th><th>Lab REFSYS (ns)</th>
-              <th>Δ (ns)</th><th>Sats</th><th>Status</th>
+              <th>Δ (ns)</th><th>Sats</th>
             </tr></thead>
             <tbody id="ep-body"></tbody>
           </table>
@@ -497,18 +520,14 @@ canvas { display: block; }
     <div id="m-content" style="display:none">
       <div class="panel">
         <div class="panel-head"><div class="panel-title">MDEV Configuration</div></div>
-        <div class="mdev-cfg">
+        <div class="mdev-cfg" style="grid-template-columns: 1fr 1fr">
           <div class="fg">
             <label>Epoch interval (s)</label>
             <input type="number" id="md-epoch" value="780">
           </div>
           <div class="fg">
-            <label>Tau min (s)</label>
-            <input type="number" id="md-tmin" value="1000">
-          </div>
-          <div class="fg">
-            <label>Tau max (s)</label>
-            <input type="number" id="md-tmax" value="100000">
+            <label>Tau points</label>
+            <input type="text" id="md-taus" value="1000, 10000, 100000" readonly style="color:var(--textsub)">
           </div>
         </div>
         <button class="mdev-run-btn" onclick="computeMDEV()">Compute MDEV</button>
@@ -519,6 +538,9 @@ canvas { display: block; }
           <div class="panel-sub" id="mdev-method"></div>
         </div>
         <div class="panel-body">
+          <div id="mdev-avg-row" style="display:none;margin-bottom:12px;padding:10px 14px;background:var(--purplelt);border:1px solid #ce93d8;border-radius:6px;font-size:12px;color:var(--purple)">
+            <strong>Average MDEV across τ = 10³, 10⁴, 10⁵ s:</strong> <span id="mdev-avg-val" style="font-family:'Source Code Pro',monospace;font-size:14px;font-weight:700;margin-left:8px"></span>
+          </div>
           <div style="position:relative;width:100%;height:340px">
             <canvas id="mdevChart"></canvas>
           </div>
@@ -752,27 +774,46 @@ function showResults(sess) {
   document.getElementById('r-empty').style.display = 'none';
   document.getElementById('r-content').style.display = 'block';
   const s = sess.summary;
+  // Reset filter state
+  mjdFrom = null; mjdTo = null;
 
+  // --- Time Range of Analysis bar ---
   document.getElementById('stat-row').innerHTML = `
-    <div class="stat-card">
-      <div class="sc-label">Mean Calibration Offset</div>
-      <div class="sc-val">${s.mean_diff_ns.toFixed(3)}<span class="sc-unit">ns</span></div>
-      <div class="sc-sub">Apply as correction to customer clock</div>
-    </div>
-    <div class="stat-card green">
-      <div class="sc-label">1σ Stability</div>
-      <div class="sc-val">${s.std_diff_ns.toFixed(3)}<span class="sc-unit">ns</span></div>
-      <div class="sc-sub">Epoch-to-epoch standard deviation</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="sc-label">Peak |Δ|</div>
-      <div class="sc-val">${s.peak_diff_ns.toFixed(2)}<span class="sc-unit">ns</span></div>
-      <div class="sc-sub">Maximum absolute deviation</div>
-    </div>
-    <div class="stat-card teal">
-      <div class="sc-label">Epochs / Days</div>
-      <div class="sc-val">${s.n_epochs}<span class="sc-unit"> / ${s.n_days}</span></div>
-      <div class="sc-sub">${s.mode} · σ-clip: ${s.sigma_filter ? 'ON' : 'OFF'}</div>
+    <div class="time-range-bar">
+      <div class="trb-section-title">⏱ Time Range of Analysis</div>
+      <div class="trb-divider"></div>
+      <div class="trb-block">
+        <div class="trb-label">MJD Range</div>
+        <div class="trb-val" id="trb-mjd">${s.mjd_start} – ${s.mjd_end}</div>
+        <div class="trb-sub" id="trb-date">${s.date_start} → ${s.date_end}</div>
+      </div>
+      <div class="trb-divider"></div>
+      <div class="trb-block">
+        <div class="trb-label">Epochs / Days Displayed</div>
+        <div class="trb-val" id="trb-epochs">${s.n_epochs} / ${s.n_days}</div>
+        <div class="trb-sub">${s.mode} · σ-clip: ${s.sigma_filter ? 'ON' : 'OFF'}</div>
+      </div>
+      <div class="trb-divider"></div>
+      <div class="trb-block">
+        <div class="trb-label">X-axis mode</div>
+        <div class="trb-mode-grp" style="margin-top:3px">
+          <button class="trb-mode-btn active" id="xmode-mjd" onclick="setXMode('mjd')">MJD</button>
+          <button class="trb-mode-btn" id="xmode-hms" onclick="setXMode('hms')">HH:MM:SS</button>
+        </div>
+        <div class="trb-sub">Label style for x-axis</div>
+      </div>
+      <div class="trb-divider"></div>
+      <div class="trb-block">
+        <div class="trb-label">Filter by MJD</div>
+        <div class="trb-ctrl" style="margin-top:3px">
+          <label>From</label>
+          <input class="trb-input" type="number" id="mjd-from" value="${s.mjd_start}" min="${s.mjd_start}" max="${s.mjd_end}">
+          <label>To</label>
+          <input class="trb-input" type="number" id="mjd-to" value="${s.mjd_end}" min="${s.mjd_start}" max="${s.mjd_end}">
+          <button class="trb-apply" onclick="applyMjdFilter()">Apply</button>
+          <button class="trb-apply" style="background:var(--grey)" onclick="resetMjdFilter()">Reset</button>
+        </div>
+      </div>
     </div>`;
 
   if (s.sigma_filter && sess.filter_nmc && sess.filter_cust) {
@@ -797,12 +838,92 @@ function showResults(sess) {
 }
 
 // ═══════════════════════════════════════
+// X-AXIS MODE & MJD FILTER
+// ═══════════════════════════════════════
+let xMode = 'mjd'; // 'mjd' or 'hms'
+let mjdFrom = null, mjdTo = null;
+
+function setXMode(mode) {
+  xMode = mode;
+  document.getElementById('xmode-mjd').classList.toggle('active', mode === 'mjd');
+  document.getElementById('xmode-hms').classList.toggle('active', mode === 'hms');
+  redrawChart();
+}
+
+function applyMjdFilter() {
+  const sess = getSession(); if (!sess) return;
+  const s = sess.summary;
+  mjdFrom = parseInt(document.getElementById('mjd-from').value) || s.mjd_start;
+  mjdTo   = parseInt(document.getElementById('mjd-to').value)   || s.mjd_end;
+  const filtered = sess.epochs.filter(e => e.MJD >= mjdFrom && e.MJD <= mjdTo);
+  const dispEpochs = filtered.length;
+  const dispDays   = new Set(filtered.map(e => e.MJD)).size;
+  const mjdMin = filtered.length ? Math.min(...filtered.map(e=>e.MJD)) : s.mjd_start;
+  const mjdMax = filtered.length ? Math.max(...filtered.map(e=>e.MJD)) : s.mjd_end;
+  document.getElementById('trb-mjd').textContent = `${mjdFrom} – ${mjdTo}`;
+  document.getElementById('trb-epochs').textContent = `${dispEpochs} / ${dispDays}`;
+  drawMainChart(filtered);
+  buildEpochTable(filtered);
+}
+
+function resetMjdFilter() {
+  const sess = getSession(); if (!sess) return;
+  const s = sess.summary;
+  mjdFrom = s.mjd_start; mjdTo = s.mjd_end;
+  document.getElementById('mjd-from').value = s.mjd_start;
+  document.getElementById('mjd-to').value   = s.mjd_end;
+  document.getElementById('trb-mjd').textContent = `${s.mjd_start} – ${s.mjd_end}`;
+  document.getElementById('trb-epochs').textContent = `${s.n_epochs} / ${s.n_days}`;
+  drawMainChart(sess.epochs);
+  buildEpochTable(sess.epochs);
+}
+
+// ═══════════════════════════════════════
 // MAIN CHART
 // ═══════════════════════════════════════
+// Custom Chart.js plugin for real vertical error bars
+const errorBarPlugin = {
+  id: 'errorBars',
+  afterDatasetDraw(chart, args) {
+    if (args.index !== 0) return;
+    const meta = chart.getDatasetMeta(0);
+    if (!meta || !chart._ebActive) return;
+    const ctx = chart.ctx;
+    const ebVal = chart._ebValue || 15;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(230,81,0,0.7)';
+    ctx.lineWidth = 1.5;
+    meta.data.forEach((point, i) => {
+      const yTop = chart.scales.y.getPixelForValue(chart.data.datasets[0].data[i] + ebVal);
+      const yBot = chart.scales.y.getPixelForValue(chart.data.datasets[0].data[i] - ebVal);
+      const x = point.x;
+      // Vertical bar
+      ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yBot); ctx.stroke();
+      // Top cap
+      ctx.beginPath(); ctx.moveTo(x - 4, yTop); ctx.lineTo(x + 4, yTop); ctx.stroke();
+      // Bottom cap
+      ctx.beginPath(); ctx.moveTo(x - 4, yBot); ctx.lineTo(x + 4, yBot); ctx.stroke();
+    });
+    ctx.restore();
+  }
+};
+Chart.register(errorBarPlugin);
+
 function drawMainChart(epochs) {
-  const useEB = document.getElementById('errbar-on').checked;
-  const labels = epochs.map(e => e.EPOCH);
-  const diffs  = epochs.map(e => e.DIFF_ns);
+  const useEB  = document.getElementById('errbar-on').checked;
+  const multiMjd = new Set(epochs.map(e => e.MJD)).size > 1;
+  // Build labels based on mode
+  let labels;
+  if (xMode === 'hms') {
+    labels = epochs.map(e => e.EPOCH);
+  } else {
+    if (multiMjd) {
+      labels = epochs.map(e => String(e.MJD));
+    } else {
+      labels = epochs.map(e => e.EPOCH); // single MJD → show hhmmss
+    }
+  }
+  const diffs = epochs.map(e => e.DIFF_ns);
 
   const datasets = [{
     label: 'Δ UTC(Lab) − UTC(NMC) [ns]',
@@ -815,27 +936,6 @@ function drawMainChart(epochs) {
     tension: 0.2,
     fill: true,
   }];
-
-  if (useEB) {
-    datasets.push({
-      label: '+15 ns',
-      data: diffs.map(v => v + 15),
-      borderColor: 'rgba(230,81,0,0.45)',
-      borderWidth: 1,
-      borderDash: [5, 4],
-      pointRadius: 0,
-      fill: false,
-    }, {
-      label: '−15 ns',
-      data: diffs.map(v => v - 15),
-      borderColor: 'rgba(230,81,0,0.45)',
-      borderWidth: 1,
-      borderDash: [5, 4],
-      pointRadius: 0,
-      fill: '-1',
-      backgroundColor: 'rgba(230,81,0,0.05)',
-    });
-  }
 
   if (charts.main) charts.main.destroy();
   const ctx = document.getElementById('mainChart').getContext('2d');
@@ -855,7 +955,13 @@ function drawMainChart(epochs) {
       },
       scales: {
         x: {
-          ticks: { color: '#78909c', font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 18 },
+          ticks: {
+            color: '#78909c', font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 18,
+          },
+          title: {
+            display: multiMjd && xMode !== 'hms',
+            text: 'MJD', color: '#1a3a6b', font: { size: 11, weight: '700' }
+          },
           grid: { color: '#eceff1' }
         },
         y: {
@@ -866,11 +972,20 @@ function drawMainChart(epochs) {
       }
     }
   });
+  // Attach error bar state to chart instance
+  charts.main._ebActive = useEB;
+  charts.main._ebValue  = 15;
+  if (useEB) charts.main.update();
 }
 
 function redrawChart() {
   const sess = getSession();
-  if (sess && sess.epochs.length) drawMainChart(sess.epochs);
+  if (!sess || !sess.epochs.length) return;
+  let epochs = sess.epochs;
+  if (mjdFrom !== null && mjdTo !== null) {
+    epochs = epochs.filter(e => e.MJD >= mjdFrom && e.MJD <= mjdTo);
+  }
+  drawMainChart(epochs);
 }
 
 // ═══════════════════════════════════════
@@ -881,15 +996,12 @@ function buildEpochTable(epochs) {
     `Showing ${Math.min(epochs.length, 300)} of ${epochs.length} epochs`;
   const body = document.getElementById('ep-body'); body.innerHTML = '';
   for (const r of epochs.slice(0, 300)) {
-    const abs = Math.abs(r.DIFF_ns);
-    const cls = abs < 30 ? 'pill-ok' : abs < 60 ? 'pill-warn' : 'pill-bad';
-    const lbl = abs < 30 ? 'OK'      : abs < 60 ? 'Review'    : 'Flag';
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td>${r.MJD}</td><td>${r.DATE}</td><td>${r.EPOCH}</td>` +
       `<td>${r.NMC_ns.toFixed(3)}</td><td>${r.CUST_ns.toFixed(3)}</td>` +
       `<td style="color:${r.DIFF_ns >= 0 ? '#1565c0' : '#c62828'};font-weight:700">${r.DIFF_ns.toFixed(3)}</td>` +
-      `<td>${r.N_SATS}</td><td><span class="pill ${cls}">${lbl}</span></td>`;
+      `<td>${r.N_SATS}</td>`;
     body.appendChild(tr);
   }
 }
@@ -928,27 +1040,55 @@ function showMdev(sess) {
   document.getElementById('mdev-result-panel').style.display = 'block';
   document.getElementById('mdev-method').textContent = `Computed via: ${method}`;
 
+  // Fixed tau targets: 10^3, 10^4, 10^5
+  const TARGET_TAUS = [1e3, 1e4, 1e5];
+  // Find closest available tau point for each target
+  function closestMdev(targetTau) {
+    let bestIdx = 0, bestDist = Infinity;
+    tau.forEach((t, i) => { const d = Math.abs(Math.log10(t) - Math.log10(targetTau)); if (d < bestDist) { bestDist = d; bestIdx = i; } });
+    return { tau: tau[bestIdx], mdev: mdev[bestIdx] };
+  }
+  const fixedPoints = TARGET_TAUS.map(t => closestMdev(t));
+  const avgMdev = fixedPoints.reduce((s, p) => s + p.mdev, 0) / fixedPoints.length;
+
+  // Show average MDEV
+  document.getElementById('mdev-avg-row').style.display = 'block';
+  document.getElementById('mdev-avg-val').textContent = avgMdev.toExponential(3) + ' s';
+
   if (charts.mdev) charts.mdev.destroy();
   const ctx = document.getElementById('mdevChart').getContext('2d');
   charts.mdev = new Chart(ctx, {
     type: 'line',
     data: {
-      datasets: [{
-        label: 'MDEV',
-        data: tau.map((t, i) => ({ x: t, y: mdev[i] })),
-        borderColor: '#6a1b9a',
-        backgroundColor: 'rgba(106,27,154,0.07)',
-        borderWidth: 2,
-        pointRadius: 3,
-        pointBackgroundColor: '#6a1b9a',
-        fill: true,
-        tension: 0.1,
-      }]
+      datasets: [
+        {
+          label: 'MDEV (all τ)',
+          data: tau.map((t, i) => ({ x: t, y: mdev[i] })),
+          borderColor: '#9c27b0',
+          backgroundColor: 'rgba(106,27,154,0.06)',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.1,
+          order: 2,
+        },
+        {
+          label: 'MDEV at τ = 10³, 10⁴, 10⁵ s',
+          data: fixedPoints.map(p => ({ x: p.tau, y: p.mdev })),
+          borderColor: '#6a1b9a',
+          backgroundColor: '#6a1b9a',
+          borderWidth: 0,
+          pointRadius: 7,
+          pointStyle: 'circle',
+          showLine: false,
+          order: 1,
+        }
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false, animation: false,
       plugins: {
-        legend: { display: false },
+        legend: { display: true, position: 'top', labels: { font: { family: 'Nunito', size: 11 }, color: '#546e7a', boxWidth: 14, padding: 12 } },
         tooltip: {
           backgroundColor: '#fff', titleColor: '#1a3a6b', bodyColor: '#546e7a',
           borderColor: '#cfd8dc', borderWidth: 1,
@@ -961,7 +1101,8 @@ function showMdev(sess) {
       scales: {
         x: {
           type: 'logarithmic',
-          title: { display: true, text: 'Averaging Time, Tau (τ) / s', color: '#1a3a6b', font: { size: 12, weight: '700', family: 'Nunito' } },
+          min: 9e2, max: 1.2e5,
+          title: { display: true, text: 'Averaging Time, τ (s)', color: '#1a3a6b', font: { size: 12, weight: '700', family: 'Nunito' } },
           ticks: {
             color: '#78909c', font: { size: 11 },
             callback: (val) => {
@@ -986,15 +1127,14 @@ function showMdev(sess) {
     }
   });
 
-  // Summary table
-  if (summary && summary.length) {
-    let html = `<table><thead><tr><th>τ (s)</th><th>MDEV (s/s)</th><th>Freq Stability</th></tr></thead><tbody>`;
-    summary.forEach(row => {
-      html += `<tr><td>${Number(row.tau).toExponential(2)}</td><td>${Number(row.mdev).toExponential(3)}</td><td>${row.label||''}</td></tr>`;
-    });
-    html += '</tbody></table>';
-    document.getElementById('mdev-summary').innerHTML = html;
-  }
+  // Summary table at fixed tau points
+  let html = `<table style="margin-top:14px"><thead><tr><th>τ (s)</th><th>MDEV (s)</th><th>Stability Label</th></tr></thead><tbody>`;
+  fixedPoints.forEach(p => {
+    let label = p.tau < 3600 ? 'sub-hour' : p.tau < 86400 ? 'sub-day' : 'multi-day';
+    html += `<tr><td>${Number(p.tau).toExponential(0)}</td><td>${Number(p.mdev).toExponential(3)}</td><td>${label}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('mdev-summary').innerHTML = html;
 }
 
 // ═══════════════════════════════════════
@@ -1003,42 +1143,30 @@ function showMdev(sess) {
 function exportCSV() {
   const sess = getSession();
   if (!sess || !sess.epochs.length) { toast('No calibration data to export.', 'warn'); return; }
+  let epochs = sess.epochs;
+  if (mjdFrom !== null && mjdTo !== null) {
+    epochs = epochs.filter(e => e.MJD >= mjdFrom && e.MJD <= mjdTo);
+  }
   const hdr = 'MJD,DATE,EPOCH,NMC_REFSYS_ns,CUST_REFSYS_ns,DIFF_ns,N_SATS\n';
-  const rows = sess.epochs.map(e =>
+  const rows = epochs.map(e =>
     `${e.MJD},${e.DATE},${e.EPOCH},${e.NMC_ns.toFixed(3)},${e.CUST_ns.toFixed(3)},${e.DIFF_ns.toFixed(3)},${e.N_SATS}`
   ).join('\n');
   downloadBlob(hdr + rows, `NMC_RemCal_${sess.label.replace(/[^a-z0-9]/gi,'_')}.csv`, 'text/csv');
   toast('CSV exported.', 'ok');
 }
 
-function exportReport() {
+function exportChart() {
+  // Export whichever chart is currently visible
+  const onMdev = innerTab === 'mdev';
+  const chart = onMdev ? charts.mdev : charts.main;
+  if (!chart) { toast('No chart to export. Run calibration first.', 'warn'); return; }
+  const a = document.createElement('a');
+  a.href = chart.toBase64Image('image/png', 1);
   const sess = getSession();
-  if (!sess || !sess.summary) { toast('No calibration data to export.', 'warn'); return; }
-  const s = sess.summary;
-  const lines = [
-    '='.repeat(60),
-    'NMC REMOTE CALIBRATION SYSTEM — CALIBRATION REPORT',
-    'National Metrology Centre, Singapore',
-    '='.repeat(60),
-    `Session  : ${sess.label}`,
-    `Mode     : ${s.mode}`,
-    `Sigma filter: ${s.sigma_filter ? 'ON (2σ)' : 'OFF'}`,
-    `MJD range: ${s.mjd_start} – ${s.mjd_end}`,
-    `Date range: ${s.date_start} – ${s.date_end}`,
-    `Epochs   : ${s.n_epochs} over ${s.n_days} day(s)`,
-    '-'.repeat(60),
-    `Mean calibration offset : ${s.mean_diff_ns.toFixed(3)} ns`,
-    `1σ stability            : ${s.std_diff_ns.toFixed(3)} ns`,
-    `Peak |Δ|                : ${s.peak_diff_ns.toFixed(2)} ns`,
-    '='.repeat(60),
-    'Epoch Data (MJD, DATE, EPOCH, NMC_ns, CUST_ns, DIFF_ns, N_SATS)',
-    '-'.repeat(60),
-    ...sess.epochs.map(e =>
-      `${e.MJD}  ${e.DATE}  ${e.EPOCH}  ${e.NMC_ns.toFixed(3).padStart(9)}  ${e.CUST_ns.toFixed(3).padStart(9)}  ${e.DIFF_ns.toFixed(3).padStart(9)}  ${e.N_SATS}`
-    ),
-  ];
-  downloadBlob(lines.join('\n'), `NMC_RemCal_Report_${sess.label.replace(/[^a-z0-9]/gi,'_')}.txt`, 'text/plain');
-  toast('Report exported.', 'ok');
+  const label = sess ? sess.label.replace(/[^a-z0-9]/gi,'_') : 'chart';
+  a.download = `NMC_RemCal_${onMdev ? 'MDEV_' : 'TimeDiff_'}${label}.png`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('Chart exported as PNG.', 'ok');
 }
 
 function downloadBlob(content, filename, mime) {
